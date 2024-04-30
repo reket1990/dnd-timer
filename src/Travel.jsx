@@ -27,7 +27,7 @@ function Travel({ gameCode = '', gameData = {}, setPageType = () => {}, saveGame
 
   return (
     <>
-      <div style={styles.name}>
+      <div>
         Game Code: { gameCode }
       </div>
       <div style={styles.title}>

@@ -38,7 +38,8 @@ function App() {
         // Initialize game object
         if (gameDoc.data() === undefined) {
           saveGameData({
-            name: 'New Game'
+            events: [],
+            timers: [],
           });
         } else {
           setGameData(gameDoc.data());

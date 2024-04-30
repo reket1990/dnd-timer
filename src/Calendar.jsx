@@ -27,7 +27,7 @@ function Calendar({ gameCode = '', gameData = {}, setPageType = () => {}, saveGa
 
   return (
     <>
-      <div style={styles.name}>
+      <div>
         Game Code: { gameCode }
       </div>
       <div style={styles.title}>

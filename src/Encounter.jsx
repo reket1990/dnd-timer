@@ -27,7 +27,7 @@ function Encounter({ gameCode = '', gameData = {}, setPageType = () => {}, saveG
 
   return (
     <>
-      <div style={styles.name}>
+      <div>
         Game Code: { gameCode }
       </div>
       <div style={styles.title}>
