@@ -1,53 +1,54 @@
-import React, { useState } from 'react';
+import React from 'react';
 
-function App() {
-  const [code, setCode] = useState('');
-
+function Calendar({ gameCode = '', gameData = {}, setPageType = () => {}, saveGameData = () => {} }) {
   const styles = {
     title: {
       fontSize: '36px',
-      marginBottom: '20px',
     },
-    input: {
-      fontSize: '24px',
-      marginBottom: '20px',
-      padding: '10px 20px',
+    contentContainer: {
+      minHeight: '500px',
     },
-    button: {
+    footer: {
+      alignItems: 'center',
+      boxSizing: 'border-box',
+      display: 'flex',
+      justifyContent: 'center',
+      maxWidth: '360px',
+      width: '100%',
+    },
+    footerButton: {
       borderRadius: '5px',
-      fontSize: '24px',
-      padding: '10px 20px',
+      fontSize: '12px',
+      minHeight: '52px',
+      padding: '10px',
+      width: '110px',
     },
   };
-
-  const onSubmitClick = (event) => {
-    window.location.href = `/?code=${code}`;
-  };
-
-  const onInputChange = (event) => {
-    setCode(event.target.value);
-  }
 
   return (
     <>
-      <div style={styles.title}>
-        Enter Game Code:
+      <div style={styles.name}>
+        Game Code: { gameCode }
       </div>
-      <input
-        id="code"
-        style={styles.input}
-        type="text"
-        value={code}
-        onChange={onInputChange}
-      />
-      <button
-        style={styles.button}
-        onClick={onSubmitClick}
-      >
-        Submit
-      </button>
+      <div style={styles.title}>
+        Calendar
+      </div>
+      <div style={styles.contentContainer}>
+
+      </div>
+      <div style={styles.footer}>
+        <button
+          style={{
+            ...styles.footerButton,
+            backgroundColor: '#C4BAAE',
+          }}
+          onClick={() => setPageType('Today')}
+        >
+          Back to Today
+        </button>
+      </div>
     </>
   );
 }
 
-export default App;
+export default Calendar;
