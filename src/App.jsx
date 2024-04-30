@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { initializeApp } from 'firebase/app';
-import { getFirestore, doc, setDoc, updateDoc, onSnapshot } from 'firebase/firestore';
+import { getFirestore, doc, setDoc, onSnapshot } from 'firebase/firestore';
 import './App.css';
 import GetCode from './GetCode';
+import Today from './Today';
+import Calendar from './Calendar';
+import Encounter from './Encounter';
+import Travel from './Travel';
 
 const firebaseConfig = {
   apiKey: "AIzaSyD5lDqvlr9v7Xakdhb6faGznTDzD_bfwFA",
@@ -20,15 +24,20 @@ const db = getFirestore(app);
 function App() {
   const [queryParameters] = useSearchParams();
   const [gameData, setGameData] = useState({});
+  const [pageType, setPageType] = useState('Today');
   const code = queryParameters.get('code');
+
+  const saveGameData = React.useCallback((gameData) => {
+    const docRef = doc(db, 'games', code);
+    setDoc(docRef, gameData);
+  }, [code]);
 
   useEffect(() => {
     if (code) {
       onSnapshot(doc(db, 'games', code), (gameDoc) => {
         // Initialize game object
         if (gameDoc.data() === undefined) {
-          const docRef = doc(db, 'games', code);
-          setDoc(docRef, {
+          saveGameData({
             name: 'New Game'
           });
         } else {
@@ -36,22 +45,53 @@ function App() {
         }
       });
     }
-  }, [code, setGameData]);
+  }, [code, setGameData, saveGameData]);
 
   let contents;
   if (code === null) {
+    // Load Get Code form if no code
     contents = <GetCode />;
-  } else {
-    contents = null;
+  } else if (pageType === 'Today') {
+    contents = (
+      <Today
+        gameCode={ code }
+        gameData={ gameData }
+        setPageType={ setPageType }
+        saveGameData={ saveGameData }
+      />
+    );
+  } else if (pageType === 'Calendar') {
+    contents = (
+      <Calendar
+        gameCode={ code }
+        gameData={ gameData }
+        setPageType={ setPageType }
+        saveGameData={ saveGameData }
+      />
+    );
+  } else if (pageType === 'Encounter') {
+    contents = (
+      <Encounter
+        gameCode={ code }
+        gameData={ gameData }
+        setPageType={ setPageType }
+        saveGameData={ saveGameData }
+      />
+    );
+  } else if (pageType === 'Travel') {
+    contents = (
+      <Travel
+        gameCode={ code }
+        gameData={ gameData }
+        setPageType={ setPageType }
+        saveGameData={ saveGameData }
+      />
+    );
   }
-
-  console.log(gameData);
 
   return (
     <div className="App">
-      <header className="App-header">
-        { contents }
-      </header>
+      { contents }
     </div>
   );
 }

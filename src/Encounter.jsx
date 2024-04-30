@@ -9,12 +9,9 @@ function App() {
       marginBottom: '20px',
     },
     input: {
-      boxSizing: 'border-box',
       fontSize: '24px',
       marginBottom: '20px',
-      maxWidth: '300px',
       padding: '10px 20px',
-      width: '100%',
     },
     button: {
       borderRadius: '5px',
