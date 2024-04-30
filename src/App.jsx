@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { initializeApp } from 'firebase/app';
 import { getFirestore, collection, getDocs } from 'firebase/firestore/lite';
+import logo from './logo.svg';
+import './App.css';
+import GetCode from './GetCode';
 
 const firebaseConfig = {
   apiKey: "AIzaSyD5lDqvlr9v7Xakdhb6faGznTDzD_bfwFA",
@@ -25,30 +27,28 @@ async function getCities(db) {
 }
 
 function App() {
+  const [queryParameters] = useSearchParams();
+  const code = queryParameters.get('code');
+
   useEffect(() => {
     const fetchData = async ()=> {
       const data = await getCities(db);
       return data;
     }
-    const cities = fetchData();
-    console.log(cities);
+    fetchData().then((res) => console.log(res));
   }, []);
+
+  let contents;
+  if (code === null) {
+    contents = <GetCode />;
+  } else {
+    contents = null;
+  }
 
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        { contents }
       </header>
     </div>
   );
