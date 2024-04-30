@@ -1,8 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, getDocs } from 'firebase/firestore/lite';
-import logo from './logo.svg';
+import { getFirestore, doc, setDoc, updateDoc, onSnapshot } from 'firebase/firestore';
 import './App.css';
 import GetCode from './GetCode';
 
@@ -18,25 +17,26 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Get a list of cities from your database
-async function getCities(db) {
-  const citiesCol = collection(db, 'cities');
-  const citySnapshot = await getDocs(citiesCol);
-  const cityList = citySnapshot.docs.map(doc => doc.data());
-  return cityList;
-}
-
 function App() {
   const [queryParameters] = useSearchParams();
+  const [gameData, setGameData] = useState({});
   const code = queryParameters.get('code');
 
   useEffect(() => {
-    const fetchData = async ()=> {
-      const data = await getCities(db);
-      return data;
+    if (code) {
+      onSnapshot(doc(db, 'games', code), (gameDoc) => {
+        // Initialize game object
+        if (gameDoc.data() === undefined) {
+          const docRef = doc(db, 'games', code);
+          setDoc(docRef, {
+            name: 'New Game'
+          });
+        } else {
+          setGameData(gameDoc.data());
+        }
+      });
     }
-    fetchData().then((res) => console.log(res));
-  }, []);
+  }, [code, setGameData]);
 
   let contents;
   if (code === null) {
@@ -44,6 +44,8 @@ function App() {
   } else {
     contents = null;
   }
+
+  console.log(gameData);
 
   return (
     <div className="App">
