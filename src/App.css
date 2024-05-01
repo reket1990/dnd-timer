@@ -1,9 +1,11 @@
 .App {
   align-items: center;
   background-color: #282c34;
+  box-sizing: border-box;
   color: white;
   display: flex;
   flex-direction: column;
+  height: 100vh;
   padding: 20px;
   text-align: center;
 }
