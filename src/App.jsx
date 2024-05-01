@@ -88,6 +88,7 @@ function App() {
     contents = (
       <Today
         gameCode={ code }
+        day={ day }
         gameData={ gameData }
         setPageType={ setPageType }
         saveGameData={ saveGameData }
@@ -115,6 +116,7 @@ function App() {
     contents = (
       <Travel
         gameCode={ code }
+        day={ day }
         gameData={ gameData }
         setPageType={ setPageType }
         saveGameData={ saveGameData }

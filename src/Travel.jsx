@@ -13,7 +13,7 @@ const travelData = [
   { name: 'Big Boat', speed: 5 },
 ];
 
-function Travel({ gameCode = '', gameData = {}, setPageType = () => {}, saveGameData = () => {} }) {
+function Travel({ gameCode = '', day = 1, gameData = {}, setPageType = () => {}, saveGameData = () => {} }) {
   const [formDuration, setFormDuration] = useState(0);
   const [formDistance, setFormDistance] = useState(0);
   const [selectedTravel, setSelectedTravel] = useState(travelData[0]);
@@ -126,7 +126,7 @@ function Travel({ gameCode = '', gameData = {}, setPageType = () => {}, saveGame
 
       <div style={styles.contentContainer}>
         <div style={styles.day}>
-          Day 1
+          Day { day }
         </div>
 
         <div style={styles.time}>

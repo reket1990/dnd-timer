@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-function Today({ gameCode = '', gameData = {}, setPageType = () => {}, saveGameData = () => {} }) {
+function Today({ gameCode = '', day = 1, gameData = {}, setPageType = () => {}, saveGameData = () => {} }) {
   const [tab, setTab] = useState('Summary');
   const [formDuration, setFormDuration] = useState(0);
   const [formDescription, setFormDescription] = useState('');
@@ -142,7 +142,7 @@ function Today({ gameCode = '', gameData = {}, setPageType = () => {}, saveGameD
       </div>
       <div style={tab === 'Summary' ? styles.shortContentContainer : styles.contentContainer}>
         <div style={styles.day}>
-          Day 1
+          Day { day }
         </div>
 
         <div style={styles.time}>
