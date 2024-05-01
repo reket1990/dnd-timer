@@ -14,7 +14,7 @@ function Calendar({ gameCode = '', setPageType = () => {}, numDays = 1, createNe
     dayLink: {
       border: '1px solid white',
       color: 'lightblue',
-      display: 'block',
+      display: 'inline-block',
       margin: '10px',
       padding: '20px',
     },
@@ -22,7 +22,7 @@ function Calendar({ gameCode = '', setPageType = () => {}, numDays = 1, createNe
       backgroundColor: 'lightblue',
       borderRadius: '3px',
       display: 'block',
-      marginTop: '20px',
+      margin: '20px auto',
       padding: '20px',
     },
     footer: {
