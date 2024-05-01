@@ -28,6 +28,21 @@ function App() {
   const code = queryParameters.get('code');
   let day = Number(queryParameters.get('day'));
 
+  // Gemini generated code to make vh correct
+  const [isStatusBarPresent, setIsStatusBarPresent] = useState(false);
+  useEffect(() => {
+    const handleResize = () => {
+      const hasStatusBar = window.innerHeight < document.documentElement.clientHeight;
+      setIsStatusBarPresent(hasStatusBar);
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    handleResize(); // Call initially on component mount
+
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   // Function that saves the full game data (all days)
   const saveFullGameData = React.useCallback((newFullGameData) => {
     const docRef = doc(db, 'games', code);
@@ -125,7 +140,7 @@ function App() {
   }
 
   return (
-    <div className="App">
+    <div className="App" style={{ height: isStatusBarPresent ? `calc(100vh - ${window.innerHeight}px)` : '100vh' }}>
       { contents }
     </div>
   );
