@@ -6,8 +6,9 @@ function Encounter({ gameCode = '', gameData = {}, setPageType = () => {}, saveG
       fontSize: '36px',
     },
     contentContainer: {
-      marginBottom: '10px',
       height: '500px',
+      marginBottom: '10px',
+      overflowY: 'auto',
     },
     footer: {
       alignItems: 'center',

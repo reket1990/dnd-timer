@@ -6,8 +6,9 @@ function Calendar({ gameCode = '', gameData = {}, setPageType = () => {}, saveGa
       fontSize: '36px',
     },
     contentContainer: {
-      marginBottom: '10px',
       height: '500px',
+      marginBottom: '10px',
+      overflowY: 'auto',
     },
     footer: {
       alignItems: 'center',
