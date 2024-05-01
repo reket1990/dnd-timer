@@ -53,7 +53,7 @@ function App() {
           });
         } else {
           // If no day is set, go to the most recent day
-          if (!day) {
+          if (!day || day > gameDoc.data().days.length) {
             window.location.href = `/?code=${code}&day=${gameDoc.data().days.length}`;
           }
 
@@ -66,11 +66,19 @@ function App() {
   const gameData = fullGameData.days[day - 1];
 
   const saveGameData = React.useCallback((newGameData) => {
-    const docRef = doc(db, 'games', code);
     const newFullGameData = {...fullGameData};
-    newFullGameData.days[day] = newGameData;
-    setDoc(docRef, newFullGameData);
-  }, [code, day, fullGameData]);
+    newFullGameData.days[day - 1] = newGameData;
+    saveFullGameData(newFullGameData);
+  }, [day, fullGameData, saveFullGameData]);
+
+  const createNewDay = React.useCallback(() => {
+    const newFullGameData = {...fullGameData};
+    newFullGameData.days.push({
+      events: [],
+      timers: [],
+    });
+    saveFullGameData(newFullGameData);
+  }, [fullGameData, saveFullGameData]);
 
   let contents;
   if (code === null) {
@@ -89,9 +97,9 @@ function App() {
     contents = (
       <Calendar
         gameCode={ code }
-        gameData={ gameData }
         setPageType={ setPageType }
-        saveGameData={ saveGameData }
+        numDays={ fullGameData.days.length }
+        createNewDay={ createNewDay }
       />
     );
   } else if (pageType === 'Encounter') {

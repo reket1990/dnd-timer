@@ -26,6 +26,7 @@ function Travel({ gameCode = '', gameData = {}, setPageType = () => {}, saveGame
       height: '500px',
       marginBottom: '10px',
       overflowY: 'auto',
+      scrollbarWidth: 'none',
     },
     day: {
       marginBottom: '10px',

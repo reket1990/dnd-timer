@@ -9,6 +9,7 @@ function Encounter({ gameCode = '', gameData = {}, setPageType = () => {}, saveG
       height: '500px',
       marginBottom: '10px',
       overflowY: 'auto',
+      scrollbarWidth: 'none',
     },
     footer: {
       alignItems: 'center',

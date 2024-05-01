@@ -1,6 +1,6 @@
 import React from 'react';
 
-function Calendar({ gameCode = '', gameData = {}, setPageType = () => {}, saveGameData = () => {} }) {
+function Calendar({ gameCode = '', setPageType = () => {}, numDays = 1, createNewDay = () => {} }) {
   const styles = {
     title: {
       fontSize: '36px',
@@ -9,6 +9,21 @@ function Calendar({ gameCode = '', gameData = {}, setPageType = () => {}, saveGa
       height: '500px',
       marginBottom: '10px',
       overflowY: 'auto',
+      scrollbarWidth: 'none',
+    },
+    dayLink: {
+      border: '1px solid white',
+      color: 'lightblue',
+      display: 'block',
+      margin: '10px',
+      padding: '20px',
+    },
+    dayDayButton: {
+      backgroundColor: 'lightblue',
+      borderRadius: '3px',
+      display: 'block',
+      marginTop: '20px',
+      padding: '20px',
     },
     footer: {
       alignItems: 'center',
@@ -35,9 +50,29 @@ function Calendar({ gameCode = '', gameData = {}, setPageType = () => {}, saveGa
       <div style={styles.title}>
         Calendar
       </div>
-      <div style={styles.contentContainer}>
 
+
+      <div style={styles.contentContainer}>
+        {Array(numDays).fill(null).map((_, index) => (
+          <a
+            style={styles.dayLink}
+            key={`dayLink-${index}`}
+            href={`/?code=${gameCode}&day=${index + 1}`}
+          >
+            Day {index + 1}
+          </a>
+        ))}
+
+
+          <button
+            style={styles.dayDayButton}
+            onClick={createNewDay}
+          >
+            + Add Day
+          </button>
       </div>
+
+
       <div style={styles.footer}>
         <button
           style={{

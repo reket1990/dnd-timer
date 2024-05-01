@@ -19,6 +19,7 @@ function Today({ gameCode = '', gameData = {}, setPageType = () => {}, saveGameD
       height: '461px', // 500 - form (29 + 10)
       overflowY: 'auto',
       marginBottom: '10px',
+      scrollbarWidth: 'none',
     },
     day: {
       marginBottom: '10px',
@@ -152,7 +153,7 @@ function Today({ gameCode = '', gameData = {}, setPageType = () => {}, saveGameD
           Summary &nbsp; ▼
         </div>
 
-        { gameData.events && tab === 'Summary' && gameData.events.length === 0 && (
+        { tab === 'Summary' && (!gameData.events || gameData.events.length === 0) && (
           <div style={styles.noEntry}>
             No events yet! Add below!
           </div>
