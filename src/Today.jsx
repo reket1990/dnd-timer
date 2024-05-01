@@ -125,6 +125,8 @@ function Today({ gameCode = '', gameData = {}, setPageType = () => {}, saveGameD
     } else {
       addTimer(formDescription, Number(formDuration), currentTime);
     }
+    setFormDuration(0);
+    setFormDescription('');
   }
 
   let timeElapsed = 360; // Days start at 6am
@@ -157,14 +159,14 @@ function Today({ gameCode = '', gameData = {}, setPageType = () => {}, saveGameD
         )}
 
         { gameData.events && tab === 'Summary' &&
-          gameData.events.map((event) => {
+          gameData.events.map((event, index) => {
             const hour = Math.floor(event.duration / 60);
             const minute = event.duration % 60;
             const startHour = Math.floor(timeElapsed / 60);
             const startMinute = timeElapsed % 60;
             timeElapsed += event.duration;
             return (
-              <div style={styles.entryContainer}>
+              <div style={styles.entryContainer} key={`event-${index}`}>
                 <div style={styles.entryTime}>
                   { startHour }:{ startMinute < 10 ? '0' : ''}{ startMinute }
                   &nbsp;→&nbsp;
@@ -188,12 +190,12 @@ function Today({ gameCode = '', gameData = {}, setPageType = () => {}, saveGameD
           </div>
         )}
         { gameData.timers && tab === 'Timers' &&
-          gameData.timers.map((event) => {
+          gameData.timers.map((event, index) => {
             const hour = Math.floor(event.duration / 60);
             const minute = event.duration % 60;
             const startHour = Math.floor(event.startTime / 60);
             const startMinute = event.startTime % 60;
-            const remainingTime = currentTime - event.startTime + event.duration;
+            const remainingTime = event.startTime - currentTime + event.duration;
             const remainingHour = Math.floor(remainingTime / 60);
             const remainingMinute = remainingTime % 60;
             let remainingText = 'expired';
@@ -201,7 +203,7 @@ function Today({ gameCode = '', gameData = {}, setPageType = () => {}, saveGameD
               remainingText = `${remainingHour}:${ remainingMinute < 10 ? '0' : ''}${remainingMinute} left`;
             }
             return (
-              <div style={styles.entryContainer}>
+              <div style={styles.entryContainer} key={`timer-${index}`}>
                 <div style={styles.entryTime}>
                   { startHour }:{ startMinute < 10 ? '0' : ''}{ startMinute }
                   &nbsp;→&nbsp;
@@ -229,7 +231,7 @@ function Today({ gameCode = '', gameData = {}, setPageType = () => {}, saveGameD
           id="code"
           style={styles.formDescriptionInput}
           type="text"
-          placeholder={ tab === 'Summary' ? 'Event Name' : 'Timer Name' }
+          placeholder={ tab === 'Summary' ? 'New Event Name' : 'New Timer Name' }
           value={formDescription}
           onChange={onFormDescriptionChange}
         />
