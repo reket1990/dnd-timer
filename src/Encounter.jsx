@@ -36,9 +36,13 @@ function Encounter({ gameCode = '', gameData = {}, setPageType = () => {}, saveG
       <div style={styles.title}>
         Encounter
       </div>
+
+
       <div style={styles.contentContainer}>
 
       </div>
+
+
       <div style={styles.footer}>
         <button
           style={{
