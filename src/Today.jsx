@@ -2,13 +2,23 @@ import React, { useState } from 'react';
 
 function Today({ gameCode = '', gameData = {}, setPageType = () => {}, saveGameData = () => {} }) {
   const [tab, setTab] = useState('Summary');
+  const [formDuration, setFormDuration] = useState(0);
+  const [formDescription, setFormDescription] = useState('');
 
   const styles = {
     title: {
       fontSize: '36px',
     },
+    shortContentContainer: {
+      height: '413px', // 500 - restContainer (38 + 10) - form (29 + 10)
+      marginBottom: '10px',
+      overflowY: 'auto',
+      scrollbarWidth: 'none',
+    },
     contentContainer: {
-      minHeight: '452px', // 500 - restContainer (38 + 10)
+      height: '461px', // 500 - form (29 + 10)
+      overflowY: 'auto',
+      marginBottom: '10px',
     },
     day: {
       marginBottom: '10px',
@@ -17,15 +27,33 @@ function Today({ gameCode = '', gameData = {}, setPageType = () => {}, saveGameD
       fontSize: '24px',
     },
     subtitle: {
+      color: '#F7F5A9',
       cursor: 'pointer',
       marginBottom: '10px',
       marginTop: '10px',
+      userSelect: 'none',
     },
     entryContainer: {
       display: 'flex',
     },
     entryTime: {
       marginRight: '20px',
+    },
+    formContainer: {
+      marginBottom: '10px',
+    },
+    formDurationInput: {
+      marginRight: '10px',
+      padding: '5px 0px',
+      textAlign: 'center',
+      width: '50px',
+    },
+    formDescriptionInput: {
+      marginRight: '10px',
+      padding: '5px 10px',
+    },
+    formButton: {
+      height: '29px',
     },
     restContainer: {
       boxSizing: 'border-box',
@@ -57,22 +85,44 @@ function Today({ gameCode = '', gameData = {}, setPageType = () => {}, saveGameD
     },
   };
 
+  // Calculate current time
+  let currentTime = 0;
+  if (gameData.events) {
+    gameData.events.map((event) => {
+      currentTime += event.duration;
+      return event;
+    });
+  }
+  const hour = 6 + Math.floor(currentTime / 60);
+  const minute = currentTime % 60;
+
   const addEvent = (name, duration) => {
     const newGameData = gameData;
     newGameData.events.push({ name, duration });
     saveGameData(newGameData);
   }
 
-  // Calculate current time
-  let totalTime = 0;
-  if (gameData.events) {
-    gameData.events.map((event) => {
-      totalTime += event.duration;
-      return event;
-    });
+  const addTimer = (name, duration, currentTime) => {
+    const newGameData = gameData;
+    newGameData.timers.push({ name, duration, startTime: currentTime });
+    saveGameData(newGameData);
   }
-  const hour = 6 + Math.floor(totalTime / 60);
-  const minute = totalTime % 60;
+
+  const onFormDurationChange = (event) => {
+    setFormDuration(event.target.value);
+  }
+
+  const onFormDescriptionChange = (event) => {
+    setFormDescription(event.target.value);
+  }
+
+  const onSubmitClick = () => {
+    if (tab === 'Summary') {
+      addEvent(formDescription, formDuration);
+    } else {
+      addTimer(formDescription, formDuration, currentTime);
+    }
+  }
 
   return (
     <>
@@ -82,7 +132,7 @@ function Today({ gameCode = '', gameData = {}, setPageType = () => {}, saveGameD
       <div style={styles.title}>
         Today
       </div>
-      <div style={styles.contentContainer}>
+      <div style={tab === 'Summary' ? styles.shortContentContainer : styles.contentContainer}>
         <div style={styles.day}>
           Day 1
         </div>
@@ -91,8 +141,8 @@ function Today({ gameCode = '', gameData = {}, setPageType = () => {}, saveGameD
           Current Time: { hour }:{ minute < 10 ? '0' : ''}{ minute }
         </div>
         
-        <div style={styles.subtitle} onClick={() => setTab('Summary')}>
-          Summary &nbsp;&nbsp; ▼
+        <div style={styles.subtitle} onClick={() => setTab(tab === 'Summary' ? 'Timers' : 'Summary')}>
+          Summary &nbsp; ▼
         </div>
 
         { gameData.events && tab === 'Summary' &&
@@ -111,32 +161,59 @@ function Today({ gameCode = '', gameData = {}, setPageType = () => {}, saveGameD
             );
           })
         }
-        <div style={styles.subtitle} onClick={() => setTab('Timers')}>
-          Timers &nbsp;&nbsp; { tab === 'Summary' ? '▼' : '▲' }
+        <div style={styles.subtitle} onClick={() => setTab(tab === 'Summary' ? 'Timers' : 'Summary')}>
+          Timers &nbsp; { tab === 'Summary' ? '▼' : '▲' }
         </div>
       </div>
 
 
-      <div style={styles.restContainer}>
+      <div style={styles.formContainer}>
+        <input
+          id="code"
+          style={styles.formDurationInput}
+          type="number"
+          value={formDuration}
+          onChange={onFormDurationChange}
+        />
+        <input
+          id="code"
+          style={styles.formDescriptionInput}
+          type="text"
+          placeholder={ tab === 'Summary' ? 'Event Name' : 'Timer Name' }
+          value={formDescription}
+          onChange={onFormDescriptionChange}
+        />
         <button
-          style={{
-            ...styles.restButton,
-            backgroundColor: '#92D7DC',
-          }}
-          onClick={() => addEvent('Short Rest', 60)}
+          style={styles.formButton}
+          onClick={onSubmitClick}
         >
-          Short Rest
-        </button>
-        <button
-          style={{
-            ...styles.restButton,
-            backgroundColor: '#6AA3A5',
-          }}
-          onClick={() => addEvent('Long Rest', 480)}
-        >
-          Long Rest
+          Submit
         </button>
       </div>
+
+
+      { tab === 'Summary' && (
+        <div style={styles.restContainer}>
+          <button
+            style={{
+              ...styles.restButton,
+              backgroundColor: '#92D7DC',
+            }}
+            onClick={() => addEvent('Short Rest', 60)}
+          >
+            Short Rest
+          </button>
+          <button
+            style={{
+              ...styles.restButton,
+              backgroundColor: '#6AA3A5',
+            }}
+            onClick={() => addEvent('Long Rest', 480)}
+          >
+            Long Rest
+          </button>
+        </div>
+      )}
 
 
       <div style={styles.footer}>

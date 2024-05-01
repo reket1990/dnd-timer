@@ -6,7 +6,8 @@ function Travel({ gameCode = '', gameData = {}, setPageType = () => {}, saveGame
       fontSize: '36px',
     },
     contentContainer: {
-      minHeight: '500px',
+      marginBottom: '10px',
+      height: '500px',
     },
     footer: {
       alignItems: 'center',
