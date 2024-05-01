@@ -23,30 +23,54 @@ const db = getFirestore(app);
 
 function App() {
   const [queryParameters] = useSearchParams();
-  const [gameData, setGameData] = useState({});
+  const [fullGameData, setFullGameData] = useState({ days: [{}] });
   const [pageType, setPageType] = useState('Today');
   const code = queryParameters.get('code');
+  let day = Number(queryParameters.get('day'));
 
-  const saveGameData = React.useCallback((gameData) => {
+  // Function that saves the full game data (all days)
+  const saveFullGameData = React.useCallback((newFullGameData) => {
     const docRef = doc(db, 'games', code);
-    setDoc(docRef, gameData);
+    return setDoc(docRef, newFullGameData);
   }, [code]);
 
+  // Load the game data from the db
   useEffect(() => {
     if (code) {
       onSnapshot(doc(db, 'games', code), (gameDoc) => {
         // Initialize game object
         if (gameDoc.data() === undefined) {
-          saveGameData({
-            events: [],
-            timers: [],
+          saveFullGameData({
+            days: [{
+              events: [],
+              timers: [],
+            }]
+          }).then(() => {
+            // New game, go to the first day
+            if (day !== '1') {
+              window.location.href = `/?code=${code}&day=1`;
+            }
           });
         } else {
-          setGameData(gameDoc.data());
+          // If no day is set, go to the most recent day
+          if (!day) {
+            window.location.href = `/?code=${code}&day=${gameDoc.data().days.length}`;
+          }
+
+          setFullGameData(gameDoc.data());
         }
       });
     }
-  }, [code, setGameData, saveGameData]);
+  }, [code, day, setFullGameData, saveFullGameData]);
+
+  const gameData = fullGameData.days[day - 1];
+
+  const saveGameData = React.useCallback((newGameData) => {
+    const docRef = doc(db, 'games', code);
+    const newFullGameData = {...fullGameData};
+    newFullGameData.days[day] = newGameData;
+    setDoc(docRef, newFullGameData);
+  }, [code, day, fullGameData]);
 
   let contents;
   if (code === null) {
