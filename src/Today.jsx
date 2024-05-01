@@ -33,6 +33,9 @@ function Today({ gameCode = '', gameData = {}, setPageType = () => {}, saveGameD
       marginTop: '10px',
       userSelect: 'none',
     },
+    noEntry: {
+      textAlign: 'center',
+    },
     entryContainer: {
       display: 'flex',
     },
@@ -86,14 +89,14 @@ function Today({ gameCode = '', gameData = {}, setPageType = () => {}, saveGameD
   };
 
   // Calculate current time
-  let currentTime = 0;
+  let currentTime = 360; // Days start at 6am
   if (gameData.events) {
     gameData.events.map((event) => {
       currentTime += event.duration;
       return event;
     });
   }
-  const hour = 6 + Math.floor(currentTime / 60);
+  const hour = Math.floor(currentTime / 60);
   const minute = currentTime % 60;
 
   const addEvent = (name, duration) => {
@@ -118,11 +121,13 @@ function Today({ gameCode = '', gameData = {}, setPageType = () => {}, saveGameD
 
   const onSubmitClick = () => {
     if (tab === 'Summary') {
-      addEvent(formDescription, formDuration);
+      addEvent(formDescription, Number(formDuration));
     } else {
-      addTimer(formDescription, formDuration, currentTime);
+      addTimer(formDescription, Number(formDuration), currentTime);
     }
   }
+
+  let timeElapsed = 360; // Days start at 6am
 
   return (
     <>
@@ -145,13 +150,24 @@ function Today({ gameCode = '', gameData = {}, setPageType = () => {}, saveGameD
           Summary &nbsp; ▼
         </div>
 
+        { gameData.events && tab === 'Summary' && gameData.events.length === 0 && (
+          <div style={styles.noEntry}>
+            No events yet! Add below!
+          </div>
+        )}
+
         { gameData.events && tab === 'Summary' &&
           gameData.events.map((event) => {
             const hour = Math.floor(event.duration / 60);
             const minute = event.duration % 60;
+            const startHour = Math.floor(timeElapsed / 60);
+            const startMinute = timeElapsed % 60;
+            timeElapsed += event.duration;
             return (
               <div style={styles.entryContainer}>
                 <div style={styles.entryTime}>
+                  { startHour }:{ startMinute < 10 ? '0' : ''}{ startMinute }
+                  &nbsp;→&nbsp;
                   { hour }:{ minute < 10 ? '0' : ''}{ minute }
                 </div>
                 <div>
@@ -161,9 +177,43 @@ function Today({ gameCode = '', gameData = {}, setPageType = () => {}, saveGameD
             );
           })
         }
+
         <div style={styles.subtitle} onClick={() => setTab(tab === 'Summary' ? 'Timers' : 'Summary')}>
           Timers &nbsp; { tab === 'Summary' ? '▼' : '▲' }
         </div>
+
+        { gameData.timers && tab === 'Timers' && gameData.timers.length === 0 && (
+          <div style={styles.noEntry}>
+            No timers yet! Add below!
+          </div>
+        )}
+        { gameData.timers && tab === 'Timers' &&
+          gameData.timers.map((event) => {
+            const hour = Math.floor(event.duration / 60);
+            const minute = event.duration % 60;
+            const startHour = Math.floor(event.startTime / 60);
+            const startMinute = event.startTime % 60;
+            const remainingTime = currentTime - event.startTime + event.duration;
+            const remainingHour = Math.floor(remainingTime / 60);
+            const remainingMinute = remainingTime % 60;
+            let remainingText = 'expired';
+            if ((remainingTime) > 0) {
+              remainingText = `${remainingHour}:${ remainingMinute < 10 ? '0' : ''}${remainingMinute} left`;
+            }
+            return (
+              <div style={styles.entryContainer}>
+                <div style={styles.entryTime}>
+                  { startHour }:{ startMinute < 10 ? '0' : ''}{ startMinute }
+                  &nbsp;→&nbsp;
+                  { hour }:{ minute < 10 ? '0' : ''}{ minute }
+                </div>
+                <div>
+                  { event.name } ({remainingText})
+                </div>
+              </div>
+            );
+          })
+        }
       </div>
 
 
