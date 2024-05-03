@@ -23,13 +23,13 @@ function App() {
     },
   };
 
-  const onSubmitClick = (event) => {
+  const onSubmitClick = () => {
     window.location.href = `/?code=${code}`;
   };
 
   const onInputChange = (event) => {
     setCode(event.target.value);
-  }
+  };
 
   return (
     <>
@@ -44,6 +44,7 @@ function App() {
         onChange={onInputChange}
       />
       <button
+        type="button"
         style={styles.button}
         onClick={onSubmitClick}
       >

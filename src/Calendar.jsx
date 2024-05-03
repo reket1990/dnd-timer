@@ -1,6 +1,9 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
-function Calendar({ gameCode = '', setPageType = () => {}, numDays = 1, createNewDay = () => {} }) {
+function Calendar({
+  gameCode, gameData, setPageType, setCurrentTime, // eslint-disable-line no-unused-vars
+}) {
   const styles = {
     title: {
       fontSize: '36px',
@@ -45,36 +48,32 @@ function Calendar({ gameCode = '', setPageType = () => {}, numDays = 1, createNe
   return (
     <>
       <div>
-        Game Code: { gameCode }
+        Game Code:
+        {' '}
+        { gameCode }
       </div>
       <div style={styles.title}>
         Calendar
       </div>
 
-
       <div style={styles.contentContainer}>
-        {Array(numDays).fill(null).map((_, index) => (
+        {/* TODO
+         {Array(numDays).fill(null).map((_, index) => (
           <a
             style={styles.dayLink}
             key={`dayLink-${index}`}
             href={`/?code=${gameCode}&day=${index + 1}`}
           >
-            Day {index + 1}
+            Day
+            {' '}
+            {index + 1}
           </a>
-        ))}
-
-
-          <button
-            style={styles.dayDayButton}
-            onClick={createNewDay}
-          >
-            + Add Day
-          </button>
+        ))} */}
       </div>
-
 
       <div style={styles.footer}>
         <button
+          type="button"
           style={{
             ...styles.footerButton,
             backgroundColor: '#C4BAAE',
@@ -87,5 +86,20 @@ function Calendar({ gameCode = '', setPageType = () => {}, numDays = 1, createNe
     </>
   );
 }
+
+Calendar.propTypes = {
+  gameCode: PropTypes.string.isRequired,
+  gameData: PropTypes.shape({
+    currentTime: PropTypes.number.isRequired,
+    events: PropTypes.arrayOf(PropTypes.shape({
+      name: PropTypes.string,
+      duration: PropTypes.number,
+      startTime: PropTypes.number,
+      type: PropTypes.string,
+    })).isRequired,
+  }).isRequired,
+  setPageType: PropTypes.func.isRequired,
+  setCurrentTime: PropTypes.func.isRequired,
+};
 
 export default Calendar;

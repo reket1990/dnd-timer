@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 
-function Today({ gameCode = '', day = 1, gameData = {}, setPageType = () => {}, saveGameData = () => {} }) {
+function Today({
+  gameCode, gameData, setPageType, saveGameData,
+}) {
   const [tab, setTab] = useState('Summary');
   const [formDuration, setFormDuration] = useState(0);
   const [formDescription, setFormDescription] = useState('');
@@ -89,66 +92,68 @@ function Today({ gameCode = '', day = 1, gameData = {}, setPageType = () => {}, 
     },
   };
 
-  // Calculate current time
-  let currentTime = 360; // Days start at 6am
-  if (gameData.events) {
-    gameData.events.map((event) => {
-      currentTime += event.duration;
-      return event;
+  const getHourAndMinutes = (unixTimestamp) => {
+    // Create a new Date object from the Unix timestamp (in milliseconds)
+    const date = new Date(unixTimestamp * 1000);
+
+    // Get the hours and minutes (using zero-padding for single digits)
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+
+    // Return a formatted string
+    return `${hours}:${minutes}`;
+  };
+
+  const addEvent = (type, name, currentTime, duration) => {
+    const newGameData = gameData;
+    newGameData.timers.push({
+      type, name, duration, startTime: currentTime,
     });
-  }
-  const hour = Math.floor(currentTime / 60);
-  const minute = currentTime % 60;
-
-  const addEvent = (name, duration) => {
-    const newGameData = gameData;
-    newGameData.events.push({ name, duration });
     saveGameData(newGameData);
-  }
-
-  const addTimer = (name, duration, currentTime) => {
-    const newGameData = gameData;
-    newGameData.timers.push({ name, duration, startTime: currentTime });
-    saveGameData(newGameData);
-  }
+  };
 
   const onFormDurationChange = (event) => {
     setFormDuration(event.target.value);
-  }
+  };
 
   const onFormDescriptionChange = (event) => {
     setFormDescription(event.target.value);
-  }
+  };
 
   const onSubmitClick = () => {
     if (tab === 'Summary') {
-      addEvent(formDescription, Number(formDuration));
+      addEvent('event', formDescription, Number(formDuration), gameData.currentTime); // TODO: field for current time
     } else {
-      addTimer(formDescription, Number(formDuration), currentTime);
+      addEvent('timer', formDescription, Number(formDuration), gameData.currentTime); // TODO: field for current time
     }
     setFormDuration(0);
     setFormDescription('');
-  }
+  };
 
   let timeElapsed = 360; // Days start at 6am
 
   return (
     <>
       <div>
-        Game Code: { gameCode }
+        Game Code:
+        {' '}
+        { gameCode }
       </div>
       <div style={styles.title}>
         Today
       </div>
       <div style={tab === 'Summary' ? styles.shortContentContainer : styles.contentContainer}>
         <div style={styles.day}>
-          Day { day }
+          Day (TODO)
+          {' '}
+          { gameData.currentTime }
         </div>
 
         <div style={styles.time}>
-          Current Time: { hour }:{ minute < 10 ? '0' : ''}{ minute }
+          Current Time:
+          {getHourAndMinutes(gameData.currentTime)}
         </div>
-        
+
         <div style={styles.subtitle} onClick={() => setTab(tab === 'Summary' ? 'Timers' : 'Summary')}>
           Summary &nbsp; ▼
         </div>
@@ -159,8 +164,8 @@ function Today({ gameCode = '', day = 1, gameData = {}, setPageType = () => {}, 
           </div>
         )}
 
-        { gameData.events && tab === 'Summary' &&
-          gameData.events.map((event, index) => {
+        { gameData.events && tab === 'Summary'
+          && gameData.events.map((event, index) => {
             const hour = Math.floor(event.duration / 60);
             const minute = event.duration % 60;
             const startHour = Math.floor(timeElapsed / 60);
@@ -169,56 +174,71 @@ function Today({ gameCode = '', day = 1, gameData = {}, setPageType = () => {}, 
             return (
               <div style={styles.entryContainer} key={`event-${index}`}>
                 <div style={styles.entryTime}>
-                  { startHour }:{ startMinute < 10 ? '0' : ''}{ startMinute }
+                  { startHour }
+                  :
+                  { startMinute < 10 ? '0' : ''}
+                  { startMinute }
                   &nbsp;→&nbsp;
-                  { hour }:{ minute < 10 ? '0' : ''}{ minute }
+                  { hour }
+                  :
+                  { minute < 10 ? '0' : ''}
+                  { minute }
                 </div>
                 <div>
                   { event.name }
                 </div>
               </div>
             );
-          })
-        }
+          })}
 
         <div style={styles.subtitle} onClick={() => setTab(tab === 'Summary' ? 'Timers' : 'Summary')}>
-          Timers &nbsp; { tab === 'Summary' ? '▼' : '▲' }
+          Timers &nbsp;
+          {' '}
+          { tab === 'Summary' ? '▼' : '▲' }
         </div>
 
-        { gameData.timers && tab === 'Timers' && gameData.timers.length === 0 && (
+        { gameData.events && tab === 'Timers' && gameData.events.length === 0 && (
           <div style={styles.noEntry}>
             No timers yet! Add below!
           </div>
         )}
-        { gameData.timers && tab === 'Timers' &&
-          gameData.timers.map((event, index) => {
+        { gameData.events && tab === 'Timers'
+          && gameData.events.map((event, index) => {
             const hour = Math.floor(event.duration / 60);
             const minute = event.duration % 60;
             const startHour = Math.floor(event.startTime / 60);
             const startMinute = event.startTime % 60;
-            const remainingTime = event.startTime - currentTime + event.duration;
+            const remainingTime = event.startTime - gameData.currentTime + event.duration;
             const remainingHour = Math.floor(remainingTime / 60);
             const remainingMinute = remainingTime % 60;
             let remainingText = 'expired';
             if ((remainingTime) > 0) {
-              remainingText = `${remainingHour}:${ remainingMinute < 10 ? '0' : ''}${remainingMinute} left`;
+              remainingText = `${remainingHour}:${remainingMinute < 10 ? '0' : ''}${remainingMinute} left`;
             }
             return (
               <div style={styles.entryContainer} key={`timer-${index}`}>
                 <div style={styles.entryTime}>
-                  { startHour }:{ startMinute < 10 ? '0' : ''}{ startMinute }
+                  { startHour }
+                  :
+                  { startMinute < 10 ? '0' : ''}
+                  { startMinute }
                   &nbsp;→&nbsp;
-                  { hour }:{ minute < 10 ? '0' : ''}{ minute }
+                  { hour }
+                  :
+                  { minute < 10 ? '0' : ''}
+                  { minute }
                 </div>
                 <div>
-                  { event.name } ({remainingText})
+                  { event.name }
+                  {' '}
+                  (
+                  {remainingText}
+                  )
                 </div>
               </div>
             );
-          })
-        }
+          })}
       </div>
-
 
       <div style={styles.formContainer}>
         <input
@@ -232,11 +252,12 @@ function Today({ gameCode = '', day = 1, gameData = {}, setPageType = () => {}, 
           id="code"
           style={styles.formDescriptionInput}
           type="text"
-          placeholder={ tab === 'Summary' ? 'New Event Name' : 'New Timer Name' }
+          placeholder={tab === 'Summary' ? 'New Event Name' : 'New Timer Name'}
           value={formDescription}
           onChange={onFormDescriptionChange}
         />
         <button
+          type="button"
           style={styles.formButton}
           onClick={onSubmitClick}
         >
@@ -244,10 +265,10 @@ function Today({ gameCode = '', day = 1, gameData = {}, setPageType = () => {}, 
         </button>
       </div>
 
-
       { tab === 'Summary' && (
         <div style={styles.restContainer}>
           <button
+            type="button"
             style={{
               ...styles.restButton,
               backgroundColor: '#92D7DC',
@@ -257,6 +278,7 @@ function Today({ gameCode = '', day = 1, gameData = {}, setPageType = () => {}, 
             Short Rest
           </button>
           <button
+            type="button"
             style={{
               ...styles.restButton,
               backgroundColor: '#6AA3A5',
@@ -268,9 +290,9 @@ function Today({ gameCode = '', day = 1, gameData = {}, setPageType = () => {}, 
         </div>
       )}
 
-
       <div style={styles.footer}>
         <button
+          type="button"
           style={{
             ...styles.footerButton,
             backgroundColor: '#837666',
@@ -280,6 +302,7 @@ function Today({ gameCode = '', day = 1, gameData = {}, setPageType = () => {}, 
           Calendar
         </button>
         <button
+          type="button"
           style={{
             ...styles.footerButton,
             backgroundColor: '#D2A1A4',
@@ -289,6 +312,7 @@ function Today({ gameCode = '', day = 1, gameData = {}, setPageType = () => {}, 
           Start Encounter
         </button>
         <button
+          type="button"
           style={{
             ...styles.footerButton,
             backgroundColor: '#AEC6AE',
@@ -301,5 +325,20 @@ function Today({ gameCode = '', day = 1, gameData = {}, setPageType = () => {}, 
     </>
   );
 }
+
+Today.propTypes = {
+  gameCode: PropTypes.string.isRequired,
+  gameData: PropTypes.shape({
+    currentTime: PropTypes.number.isRequired,
+    events: PropTypes.arrayOf(PropTypes.shape({
+      name: PropTypes.string,
+      duration: PropTypes.number,
+      startTime: PropTypes.number,
+      type: PropTypes.string,
+    })).isRequired,
+  }).isRequired,
+  setPageType: PropTypes.func.isRequired,
+  saveGameData: PropTypes.func.isRequired,
+};
 
 export default Today;

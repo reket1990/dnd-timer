@@ -1,6 +1,9 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
-function Encounter({ gameCode = '', gameData = {}, setPageType = () => {}, saveGameData = () => {} }) {
+function Encounter({
+  gameCode, gameData, setPageType, saveGameData, // eslint-disable-line no-unused-vars
+}) {
   const styles = {
     title: {
       fontSize: '36px',
@@ -31,20 +34,19 @@ function Encounter({ gameCode = '', gameData = {}, setPageType = () => {}, saveG
   return (
     <>
       <div>
-        Game Code: { gameCode }
+        Game Code:
+        {' '}
+        { gameCode }
       </div>
       <div style={styles.title}>
         Encounter
       </div>
 
-
-      <div style={styles.contentContainer}>
-
-      </div>
-
+      <div style={styles.contentContainer} />
 
       <div style={styles.footer}>
         <button
+          type="button"
           style={{
             ...styles.footerButton,
             backgroundColor: '#C4BAAE',
@@ -57,5 +59,20 @@ function Encounter({ gameCode = '', gameData = {}, setPageType = () => {}, saveG
     </>
   );
 }
+
+Encounter.propTypes = {
+  gameCode: PropTypes.string.isRequired,
+  gameData: PropTypes.shape({
+    currentTime: PropTypes.number.isRequired,
+    events: PropTypes.arrayOf(PropTypes.shape({
+      name: PropTypes.string,
+      duration: PropTypes.number,
+      startTime: PropTypes.number,
+      type: PropTypes.string,
+    })).isRequired,
+  }).isRequired,
+  setPageType: PropTypes.func.isRequired,
+  saveGameData: PropTypes.func.isRequired,
+};
 
 export default Encounter;
