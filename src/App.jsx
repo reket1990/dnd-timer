@@ -45,11 +45,11 @@ function App() {
   const addEvent = (type, name, startTime, duration, callback = () => {}) => {
     const newGameData = gameData;
     newGameData.events.push({
-      type: 'event', name, startTime, duration,
+      type, name, startTime, duration,
     });
 
     // Check if we should change current time
-    if (startTime + duration >= gameData.currentTime) {
+    if (type === 'event' && startTime + duration >= gameData.currentTime) {
       newGameData.currentTime = startTime + duration;
     }
 
