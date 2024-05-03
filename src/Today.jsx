@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import TimeHeader from './components/TimeHeader';
 
 function Today({
   gameCode, gameData, setPageType, saveGameData,
@@ -23,12 +24,6 @@ function Today({
       overflowY: 'auto',
       marginBottom: '10px',
       scrollbarWidth: 'none',
-    },
-    day: {
-      marginBottom: '10px',
-    },
-    time: {
-      fontSize: '24px',
     },
     subtitle: {
       color: '#F7F5A9',
@@ -92,18 +87,6 @@ function Today({
     },
   };
 
-  const getHourAndMinutes = (unixTimestamp) => {
-    // Create a new Date object from the Unix timestamp (in milliseconds)
-    const date = new Date(unixTimestamp * 1000);
-
-    // Get the hours and minutes (using zero-padding for single digits)
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-
-    // Return a formatted string
-    return `${hours}:${minutes}`;
-  };
-
   const addEvent = (type, name, currentTime, duration) => {
     const newGameData = gameData;
     newGameData.timers.push({
@@ -143,16 +126,7 @@ function Today({
         Today
       </div>
       <div style={tab === 'Summary' ? styles.shortContentContainer : styles.contentContainer}>
-        <div style={styles.day}>
-          Day (TODO)
-          {' '}
-          { gameData.currentTime }
-        </div>
-
-        <div style={styles.time}>
-          Current Time:
-          {getHourAndMinutes(gameData.currentTime)}
-        </div>
+        <TimeHeader currentTime={gameData.currentTime} />
 
         <div style={styles.subtitle} onClick={() => setTab(tab === 'Summary' ? 'Timers' : 'Summary')}>
           Summary &nbsp; ▼

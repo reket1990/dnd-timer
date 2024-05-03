@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import TimeHeader from './components/TimeHeader';
 
 const travelData = [
   { name: 'Walk', speed: 3 },
@@ -30,12 +31,6 @@ function Travel({
       marginBottom: '10px',
       overflowY: 'auto',
       scrollbarWidth: 'none',
-    },
-    day: {
-      marginBottom: '10px',
-    },
-    time: {
-      fontSize: '24px',
     },
     travelOptionContainer: {
       display: 'block',
@@ -76,17 +71,6 @@ function Travel({
       width: '110px',
     },
   };
-
-  // Calculate current time
-  let currentTime = 360; // Days start at 6am
-  if (gameData.events) {
-    gameData.events.map((event) => {
-      currentTime += event.duration;
-      return event;
-    });
-  }
-  const hour = Math.floor(currentTime / 60);
-  const minute = currentTime % 60;
 
   const addEvent = (name, duration) => {
     const newGameData = gameData;
@@ -130,20 +114,7 @@ function Travel({
       </div>
 
       <div style={styles.contentContainer}>
-        <div style={styles.day}>
-          Day (TEMP)
-          {' '}
-          { gameData.currentTime }
-        </div>
-
-        <div style={styles.time}>
-          Current Time:
-          {' '}
-          { hour }
-          :
-          { minute < 10 ? '0' : ''}
-          { minute }
-        </div>
+        <TimeHeader currentTime={gameData.currentTime} />
 
         <h2>Choose your travel method:</h2>
         {travelData.map((travelOption) => (

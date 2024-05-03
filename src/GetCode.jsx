@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-function App() {
+function GetCode() {
   const [code, setCode] = useState('');
 
   const styles = {
@@ -54,4 +54,4 @@ function App() {
   );
 }
 
-export default App;
+export default GetCode;
