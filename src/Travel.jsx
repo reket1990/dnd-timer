@@ -18,6 +18,7 @@ const travelData = [
 function Travel({
   gameCode, gameData, setPageType, saveGameData,
 }) {
+  const [formStartTime, setFormStartTime] = useState(gameData.currentTime);
   const [formDuration, setFormDuration] = useState(0);
   const [formDistance, setFormDistance] = useState(0);
   const [selectedTravel, setSelectedTravel] = useState(travelData[0]);
@@ -49,6 +50,11 @@ function Travel({
       textAlign: 'center',
       width: '50px',
     },
+    formInputStartTime: {
+      padding: '5px 0px',
+      textAlign: 'center',
+      width: '100px',
+    },
     formButton: {
       borderRadius: '20px',
       display: 'block',
@@ -72,9 +78,11 @@ function Travel({
     },
   };
 
-  const addEvent = (name, duration) => {
+  const addEvent = (name, startTime, duration) => {
     const newGameData = gameData;
-    newGameData.events.push({ name, duration });
+    newGameData.events.push({
+      type: 'event', name, startTime, duration,
+    });
     saveGameData(newGameData);
   };
 
@@ -95,9 +103,14 @@ function Travel({
     setFormDuration(Number(event.target.value) / selectedTravel.speed * 60); // eslint-disable-line no-mixed-operators
   };
 
+  const onFormStartTimeChange = (event) => {
+    setFormStartTime(event.target.value);
+  };
+
   const onSubmitClick = () => {
     const formDescription = `${selectedTravel.name} (${selectedTravel.speed}mph) - ${Number(formDistance).toFixed(1)} miles`;
-    addEvent(formDescription, Math.floor(Number(formDuration)));
+    addEvent(formDescription, Math.floor(Number(formStartTime)), Math.floor(Number(formDuration)));
+    setFormStartTime(gameData.currentTime);
     setFormDuration(0);
     setFormDistance(0);
   };
@@ -135,17 +148,16 @@ function Travel({
           </label>
         ))}
         <p>
-          You selected:
+          You selected: &nbsp;
           {selectedTravel.name}
-          {' '}
-          (speed:
+          &nbsp;(speed:&nbsp;
           {selectedTravel.speed}
           mph)
         </p>
 
         <div style={styles.formContainer}>
           <input
-            id="code"
+            id="duration"
             style={styles.formInput}
             type="number"
             value={formDuration}
@@ -153,7 +165,7 @@ function Travel({
           />
           minutes or &nbsp;
           <input
-            id="code"
+            id="distance"
             style={styles.formInput}
             type="number"
             value={formDistance}
@@ -161,6 +173,18 @@ function Travel({
           />
           miles
         </div>
+
+        <div style={styles.formContainer}>
+          Start time: &nbsp;
+          <input
+            id="start"
+            style={styles.formInputStartTime}
+            type="number"
+            value={formStartTime}
+            onChange={onFormStartTimeChange}
+          />
+        </div>
+
         <button
           type="button"
           style={styles.formButton}
