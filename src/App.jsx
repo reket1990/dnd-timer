@@ -23,31 +23,22 @@ const db = getFirestore(app);
 
 function App() {
   const [queryParameters] = useSearchParams();
-  const [fullGameData, setFullGameData] = useState({ days: [{}] });
+  const [gameData, setGameData] = useState({ currentTime: 0, events: [] });
   const [pageType, setPageType] = useState('Today');
   const code = queryParameters.get('code');
   let day = Number(queryParameters.get('day'));
 
-  // Gemini generated code to make vh correct
-  const [isStatusBarPresent, setIsStatusBarPresent] = useState(false);
-  useEffect(() => {
-    const handleResize = () => {
-      const hasStatusBar = window.innerHeight < document.documentElement.clientHeight;
-      setIsStatusBarPresent(hasStatusBar);
-    };
-
-    window.addEventListener('resize', handleResize);
-
-    handleResize(); // Call initially on component mount
-
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  // Function that saves the full game data (all days)
-  const saveFullGameData = React.useCallback((newFullGameData) => {
+  // Function that saves the game data
+  const saveGameData = React.useCallback((newGameData) => {
     const docRef = doc(db, 'games', code);
-    return setDoc(docRef, newFullGameData);
+    return setDoc(docRef, newGameData);
   }, [code]);
+
+  const setCurrentTime = React.useCallback((newTime) => {
+    const newGameData = {...gameData};
+    newGameData.time = newTime;
+    saveGameData(newGameData);
+  }, [gameData, saveGameData]);
 
   // Load the game data from the db
   useEffect(() => {
@@ -55,45 +46,16 @@ function App() {
       onSnapshot(doc(db, 'games', code), (gameDoc) => {
         // Initialize game object
         if (gameDoc.data() === undefined) {
-          saveFullGameData({
-            days: [{
-              events: [],
-              timers: [],
-            }]
-          }).then(() => {
-            // New game, go to the first day
-            if (day !== '1') {
-              window.location.href = `/?code=${code}&day=1`;
-            }
+          saveGameData({
+            currentTime: 0,
+            events: [],
           });
         } else {
-          // If no day is set, go to the most recent day
-          if (!day || day > gameDoc.data().days.length) {
-            window.location.href = `/?code=${code}&day=${gameDoc.data().days.length}`;
-          }
-
-          setFullGameData(gameDoc.data());
+          setGameData(gameDoc.data());
         }
       });
     }
-  }, [code, day, setFullGameData, saveFullGameData]);
-
-  const gameData = fullGameData.days[day - 1];
-
-  const saveGameData = React.useCallback((newGameData) => {
-    const newFullGameData = {...fullGameData};
-    newFullGameData.days[day - 1] = newGameData;
-    saveFullGameData(newFullGameData);
-  }, [day, fullGameData, saveFullGameData]);
-
-  const createNewDay = React.useCallback(() => {
-    const newFullGameData = {...fullGameData};
-    newFullGameData.days.push({
-      events: [],
-      timers: [],
-    });
-    saveFullGameData(newFullGameData);
-  }, [fullGameData, saveFullGameData]);
+  }, [code, day, setGameData, saveGameData]);
 
   let contents;
   if (code === null) {
@@ -113,9 +75,9 @@ function App() {
     contents = (
       <Calendar
         gameCode={ code }
+        gameData={ gameData }
         setPageType={ setPageType }
-        numDays={ fullGameData.days.length }
-        createNewDay={ createNewDay }
+        setCurrentTime={ setCurrentTime }
       />
     );
   } else if (pageType === 'Encounter') {
@@ -140,7 +102,7 @@ function App() {
   }
 
   return (
-    <div className="App" style={{ height: isStatusBarPresent ? `calc(100vh - ${window.innerHeight}px)` : '100vh' }}>
+    <div className="App">
       { contents }
     </div>
   );
