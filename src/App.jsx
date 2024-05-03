@@ -5,6 +5,7 @@ import {
   getFirestore, doc, setDoc, onSnapshot,
 } from 'firebase/firestore';
 import './App.css';
+import Header from './shared/Header';
 import GetCode from './GetCode';
 import Today from './Today';
 import Calendar from './Calendar';
@@ -60,10 +61,18 @@ function App() {
   }, [code, day, setGameData, saveGameData]);
 
   let contents;
+  let title;
   if (code === null) {
     // Load Get Code form if no code
-    contents = <GetCode />;
-  } else if (pageType === 'Today') {
+    return (
+      <div className="App">
+        <GetCode />
+      </div>
+    );
+  }
+
+  if (pageType === 'Today') {
+    title = 'Today';
     contents = (
       <Today
         gameCode={code}
@@ -74,6 +83,7 @@ function App() {
       />
     );
   } else if (pageType === 'Calendar') {
+    title = 'Calendar';
     contents = (
       <Calendar
         gameCode={code}
@@ -83,6 +93,7 @@ function App() {
       />
     );
   } else if (pageType === 'Encounter') {
+    title = 'Encounter';
     contents = (
       <Encounter
         gameCode={code}
@@ -92,6 +103,7 @@ function App() {
       />
     );
   } else if (pageType === 'Travel') {
+    title = 'Travel';
     contents = (
       <Travel
         gameCode={code}
@@ -104,6 +116,7 @@ function App() {
 
   return (
     <div className="App">
+      <Header gameCode={code} currentTime={gameData.currentTime} title={title} />
       { contents }
     </div>
   );

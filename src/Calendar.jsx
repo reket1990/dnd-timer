@@ -2,12 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 function Calendar({
-  gameCode, gameData, setPageType, setCurrentTime, // eslint-disable-line no-unused-vars
+  gameData, setPageType, setCurrentTime, // eslint-disable-line no-unused-vars
 }) {
   const styles = {
-    title: {
-      fontSize: '36px',
-    },
     contentContainer: {
       height: '500px',
       marginBottom: '10px',
@@ -47,15 +44,6 @@ function Calendar({
 
   return (
     <>
-      <div>
-        Game Code:
-        {' '}
-        { gameCode }
-      </div>
-      <div style={styles.title}>
-        Calendar
-      </div>
-
       <div style={styles.contentContainer}>
         {/* TODO
          {Array(numDays).fill(null).map((_, index) => (
@@ -88,7 +76,6 @@ function Calendar({
 }
 
 Calendar.propTypes = {
-  gameCode: PropTypes.string.isRequired,
   gameData: PropTypes.shape({
     currentTime: PropTypes.number.isRequired,
     events: PropTypes.arrayOf(PropTypes.shape({

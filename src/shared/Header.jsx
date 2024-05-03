@@ -1,9 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { getDate, getHourAndMinutes } from '../utils';
+import { getDate, getHourAndMinutes } from './utils';
 
-function TimeHeader({ currentTime }) {
+function Header({ currentTime, gameCode, title }) {
   const styles = {
+    title: {
+      fontSize: '36px',
+    },
     day: {
       marginBottom: '10px',
     },
@@ -14,6 +17,14 @@ function TimeHeader({ currentTime }) {
 
   return (
     <>
+      <div>
+        Game Code: &nbsp;
+        { gameCode }
+      </div>
+      <div style={styles.title}>
+        { title }
+      </div>
+
       <div style={styles.day}>
         Current Date: &nbsp;
         { getDate(currentTime) }
@@ -27,8 +38,10 @@ function TimeHeader({ currentTime }) {
   );
 }
 
-TimeHeader.propTypes = {
+Header.propTypes = {
   currentTime: PropTypes.number.isRequired,
+  gameCode: PropTypes.string.isRequired,
+  title: PropTypes.string.isRequired,
 };
 
-export default TimeHeader;
+export default Header;

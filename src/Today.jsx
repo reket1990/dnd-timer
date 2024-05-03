@@ -1,18 +1,15 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import TimeHeader from './components/TimeHeader';
+import { getHourAndMinutes } from './shared/utils';
 
 function Today({
-  gameCode, gameData, setPageType, saveGameData,
+  gameData, setPageType, saveGameData,
 }) {
   const [tab, setTab] = useState('Summary');
   const [formDuration, setFormDuration] = useState(0);
   const [formDescription, setFormDescription] = useState('');
 
   const styles = {
-    title: {
-      fontSize: '36px',
-    },
     shortContentContainer: {
       height: '413px', // 500 - restContainer (38 + 10) - form (29 + 10)
       marginBottom: '10px',
@@ -113,57 +110,38 @@ function Today({
     setFormDescription('');
   };
 
-  let timeElapsed = 360; // Days start at 6am
-
   return (
     <>
-      <div>
-        Game Code:
-        {' '}
-        { gameCode }
-      </div>
-      <div style={styles.title}>
-        Today
-      </div>
       <div style={tab === 'Summary' ? styles.shortContentContainer : styles.contentContainer}>
-        <TimeHeader currentTime={gameData.currentTime} />
-
         <div style={styles.subtitle} onClick={() => setTab(tab === 'Summary' ? 'Timers' : 'Summary')}>
           Summary &nbsp; ▼
         </div>
 
-        { tab === 'Summary' && (!gameData.events || gameData.events.length === 0) && (
+        { tab === 'Summary' && gameData.events.length === 0 && (
           <div style={styles.noEntry}>
             No events yet! Add below!
           </div>
         )}
 
-        { gameData.events && tab === 'Summary'
-          && gameData.events.map((event, index) => {
-            const hour = Math.floor(event.duration / 60);
-            const minute = event.duration % 60;
-            const startHour = Math.floor(timeElapsed / 60);
-            const startMinute = timeElapsed % 60;
-            timeElapsed += event.duration;
-            return (
-              <div style={styles.entryContainer} key={`event-${index}`}>
-                <div style={styles.entryTime}>
-                  { startHour }
-                  :
-                  { startMinute < 10 ? '0' : ''}
-                  { startMinute }
-                  &nbsp;→&nbsp;
-                  { hour }
-                  :
-                  { minute < 10 ? '0' : ''}
-                  { minute }
-                </div>
-                <div>
-                  { event.name }
-                </div>
+        { tab === 'Summary'
+          && gameData.events.filter((event) => event.type === 'event').map((event, index) => (
+            <div style={styles.entryContainer} key={`event-${index}`}>
+              <div style={styles.entryTime}>
+                { getHourAndMinutes(event.startTime) }
+                &nbsp;→&nbsp;
+                { getHourAndMinutes(event.duration) }
               </div>
-            );
-          })}
+              <div>
+                { event.name }
+                &nbsp;
+                {
+                  event.startTime - gameData.currentTime + event.duration > 0
+                    ? `(${getHourAndMinutes(event.startTime - gameData.currentTime + event.duration > 0)} left)`
+                    : ''
+                }
+              </div>
+            </div>
+          ))}
 
         <div style={styles.subtitle} onClick={() => setTab(tab === 'Summary' ? 'Timers' : 'Summary')}>
           Timers &nbsp;
@@ -171,47 +149,30 @@ function Today({
           { tab === 'Summary' ? '▼' : '▲' }
         </div>
 
-        { gameData.events && tab === 'Timers' && gameData.events.length === 0 && (
+        { tab === 'Timers' && gameData.events.length === 0 && (
           <div style={styles.noEntry}>
             No timers yet! Add below!
           </div>
         )}
-        { gameData.events && tab === 'Timers'
-          && gameData.events.map((event, index) => {
-            const hour = Math.floor(event.duration / 60);
-            const minute = event.duration % 60;
-            const startHour = Math.floor(event.startTime / 60);
-            const startMinute = event.startTime % 60;
-            const remainingTime = event.startTime - gameData.currentTime + event.duration;
-            const remainingHour = Math.floor(remainingTime / 60);
-            const remainingMinute = remainingTime % 60;
-            let remainingText = 'expired';
-            if ((remainingTime) > 0) {
-              remainingText = `${remainingHour}:${remainingMinute < 10 ? '0' : ''}${remainingMinute} left`;
-            }
-            return (
-              <div style={styles.entryContainer} key={`timer-${index}`}>
-                <div style={styles.entryTime}>
-                  { startHour }
-                  :
-                  { startMinute < 10 ? '0' : ''}
-                  { startMinute }
-                  &nbsp;→&nbsp;
-                  { hour }
-                  :
-                  { minute < 10 ? '0' : ''}
-                  { minute }
-                </div>
-                <div>
-                  { event.name }
-                  {' '}
-                  (
-                  {remainingText}
-                  )
-                </div>
+        { tab === 'Timers'
+          && gameData.events.filter((event) => event.type === 'event').map((event, index) => (
+            <div style={styles.entryContainer} key={`timer-${index}`}>
+              <div style={styles.entryTime}>
+                { getHourAndMinutes(event.startTime) }
+                &nbsp;→&nbsp;
+                { getHourAndMinutes(event.duration) }
               </div>
-            );
-          })}
+              <div>
+                { event.name }
+                &nbsp;
+                {
+                  event.startTime - gameData.currentTime + event.duration > 0
+                    ? `(${getHourAndMinutes(event.startTime - gameData.currentTime + event.duration > 0)} left)`
+                    : '(expired)'
+                }
+              </div>
+            </div>
+          ))}
       </div>
 
       <div style={styles.formContainer}>
@@ -301,7 +262,6 @@ function Today({
 }
 
 Today.propTypes = {
-  gameCode: PropTypes.string.isRequired,
   gameData: PropTypes.shape({
     currentTime: PropTypes.number.isRequired,
     events: PropTypes.arrayOf(PropTypes.shape({

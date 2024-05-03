@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import TimeHeader from './components/TimeHeader';
 
 const travelData = [
   { name: 'Walk', speed: 3 },
@@ -16,7 +15,7 @@ const travelData = [
 ];
 
 function Travel({
-  gameCode, gameData, setPageType, saveGameData,
+  gameData, setPageType, saveGameData,
 }) {
   const [formStartTime, setFormStartTime] = useState(gameData.currentTime);
   const [formDuration, setFormDuration] = useState(0);
@@ -24,9 +23,6 @@ function Travel({
   const [selectedTravel, setSelectedTravel] = useState(travelData[0]);
 
   const styles = {
-    title: {
-      fontSize: '36px',
-    },
     contentContainer: {
       height: '500px',
       marginBottom: '10px',
@@ -117,18 +113,7 @@ function Travel({
 
   return (
     <>
-      <div>
-        Game Code:
-        {' '}
-        { gameCode }
-      </div>
-      <div style={styles.title}>
-        Travel Calculator
-      </div>
-
       <div style={styles.contentContainer}>
-        <TimeHeader currentTime={gameData.currentTime} />
-
         <h2>Choose your travel method:</h2>
         {travelData.map((travelOption) => (
           <label style={styles.travelOptionContainer} key={travelOption.name} htmlFor="travelOption">
@@ -211,7 +196,6 @@ function Travel({
 }
 
 Travel.propTypes = {
-  gameCode: PropTypes.string.isRequired,
   gameData: PropTypes.shape({
     currentTime: PropTypes.number.isRequired,
     events: PropTypes.arrayOf(PropTypes.shape({
