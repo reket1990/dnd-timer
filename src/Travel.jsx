@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 
 const travelData = [
   { name: 'Walk', speed: 3 },
@@ -13,7 +14,9 @@ const travelData = [
   { name: 'Big Boat', speed: 5 },
 ];
 
-function Travel({ gameCode = '', day = 1, gameData = {}, setPageType = () => {}, saveGameData = () => {} }) {
+function Travel({
+  gameCode, gameData, setPageType, saveGameData,
+}) {
   const [formDuration, setFormDuration] = useState(0);
   const [formDistance, setFormDistance] = useState(0);
   const [selectedTravel, setSelectedTravel] = useState(travelData[0]);
@@ -89,36 +92,38 @@ function Travel({ gameCode = '', day = 1, gameData = {}, setPageType = () => {},
     const newGameData = gameData;
     newGameData.events.push({ name, duration });
     saveGameData(newGameData);
-  }
+  };
 
   const handleRadioChange = (event) => {
     const selectedTravelIndex = travelData.findIndex(
-      (travel) => travel.name === event.target.value
+      (travel) => travel.name === event.target.value,
     );
     setSelectedTravel(travelData[selectedTravelIndex]);
   };
 
   const onFormDurationChange = (event) => {
     setFormDuration(event.target.value);
-    setFormDistance(Number(event.target.value) / 60 * selectedTravel.speed);
-  }
+    setFormDistance(Number(event.target.value) / 60 * selectedTravel.speed); // eslint-disable-line no-mixed-operators
+  };
 
   const onFormDistanceChange = (event) => {
     setFormDistance(event.target.value);
-    setFormDuration(Number(event.target.value) / selectedTravel.speed * 60);
-  }
+    setFormDuration(Number(event.target.value) / selectedTravel.speed * 60); // eslint-disable-line no-mixed-operators
+  };
 
   const onSubmitClick = () => {
-    const formDescription = `${selectedTravel.name} (${selectedTravel.speed}mph) - ${Number(formDistance).toFixed(1)} miles`
+    const formDescription = `${selectedTravel.name} (${selectedTravel.speed}mph) - ${Number(formDistance).toFixed(1)} miles`;
     addEvent(formDescription, Math.floor(Number(formDuration)));
     setFormDuration(0);
     setFormDistance(0);
-  }
+  };
 
   return (
     <>
       <div>
-        Game Code: { gameCode }
+        Game Code:
+        {' '}
+        { gameCode }
       </div>
       <div style={styles.title}>
         Travel Calculator
@@ -126,28 +131,46 @@ function Travel({ gameCode = '', day = 1, gameData = {}, setPageType = () => {},
 
       <div style={styles.contentContainer}>
         <div style={styles.day}>
-          Day { day }
+          Day (TEMP)
+          {' '}
+          { gameData.currentTime }
         </div>
 
         <div style={styles.time}>
-          Current Time: { hour }:{ minute < 10 ? '0' : ''}{ minute }
+          Current Time:
+          {' '}
+          { hour }
+          :
+          { minute < 10 ? '0' : ''}
+          { minute }
         </div>
 
         <h2>Choose your travel method:</h2>
         {travelData.map((travelOption) => (
-          <label style={styles.travelOptionContainer} key={travelOption.name}>
+          <label style={styles.travelOptionContainer} key={travelOption.name} htmlFor="travelOption">
             <input
+              id="travelOption"
               style={styles.travelOptionBubble}
               type="radio"
               value={travelOption.name}
               checked={selectedTravel.name === travelOption.name}
               onChange={handleRadioChange}
             />
-            {travelOption.name} &nbsp; ({travelOption.speed}mph)
+            {travelOption.name}
+            {' '}
+&nbsp; (
+            {travelOption.speed}
+            mph)
           </label>
         ))}
-        <p>You selected: {selectedTravel.name} (speed: {selectedTravel.speed}mph)</p>
-
+        <p>
+          You selected:
+          {selectedTravel.name}
+          {' '}
+          (speed:
+          {selectedTravel.speed}
+          mph)
+        </p>
 
         <div style={styles.formContainer}>
           <input
@@ -168,16 +191,17 @@ function Travel({ gameCode = '', day = 1, gameData = {}, setPageType = () => {},
           miles
         </div>
         <button
-            style={styles.formButton}
-            onClick={onSubmitClick}
-          >
-            Submit
-          </button>
+          type="button"
+          style={styles.formButton}
+          onClick={onSubmitClick}
+        >
+          Submit
+        </button>
       </div>
-
 
       <div style={styles.footer}>
         <button
+          type="button"
           style={{
             ...styles.footerButton,
             backgroundColor: '#C4BAAE',
@@ -190,5 +214,20 @@ function Travel({ gameCode = '', day = 1, gameData = {}, setPageType = () => {},
     </>
   );
 }
+
+Travel.propTypes = {
+  gameCode: PropTypes.string.isRequired,
+  gameData: PropTypes.shape({
+    currentTime: PropTypes.number.isRequired,
+    events: PropTypes.arrayOf(PropTypes.shape({
+      name: PropTypes.string,
+      duration: PropTypes.number,
+      startTime: PropTypes.number,
+      type: PropTypes.string,
+    })).isRequired,
+  }).isRequired,
+  setPageType: PropTypes.func.isRequired,
+  saveGameData: PropTypes.func.isRequired,
+};
 
 export default Travel;
