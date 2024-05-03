@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { getHourAndMinutes } from './shared/utils';
+import { getHourAndMinutes, getHourAndMinutesFromUnix } from './shared/utils';
 
 function Today({
   gameData, setPageType, saveGameData,
@@ -124,21 +124,18 @@ function Today({
         )}
 
         { tab === 'Summary'
-          && gameData.events.filter((event) => event.type === 'event').map((event, index) => (
+          && gameData.events.filter((event) => event.type === 'event').sort((a, b) => a.startTime - b.startTime).map((event, index) => (
             <div style={styles.entryContainer} key={`event-${index}`}>
               <div style={styles.entryTime}>
-                { getHourAndMinutes(event.startTime) }
+                { getHourAndMinutesFromUnix(event.startTime) }
                 &nbsp;→&nbsp;
                 { getHourAndMinutes(event.duration) }
               </div>
               <div>
                 { event.name }
                 &nbsp;
-                {
-                  event.startTime - gameData.currentTime + event.duration > 0
-                    ? `(${getHourAndMinutes(event.startTime - gameData.currentTime + event.duration > 0)} left)`
-                    : ''
-                }
+                { (event.startTime > gameData.currentTime) && '(future)' }
+                { (event.startTime <= gameData.currentTime) && (event.startTime - gameData.currentTime + event.duration > 0) && `(${getHourAndMinutes(event.startTime - gameData.currentTime + event.duration)} left)` }
               </div>
             </div>
           ))}
@@ -155,21 +152,19 @@ function Today({
           </div>
         )}
         { tab === 'Timers'
-          && gameData.events.filter((event) => event.type === 'event').map((event, index) => (
+          && gameData.events.filter((event) => event.type === 'timer').sort((a, b) => a.startTime - b.startTime).map((event, index) => (
             <div style={styles.entryContainer} key={`timer-${index}`}>
               <div style={styles.entryTime}>
-                { getHourAndMinutes(event.startTime) }
+                { getHourAndMinutesFromUnix(event.startTime) }
                 &nbsp;→&nbsp;
                 { getHourAndMinutes(event.duration) }
               </div>
               <div>
                 { event.name }
                 &nbsp;
-                {
-                  event.startTime - gameData.currentTime + event.duration > 0
-                    ? `(${getHourAndMinutes(event.startTime - gameData.currentTime + event.duration > 0)} left)`
-                    : '(expired)'
-                }
+                { (event.startTime > gameData.currentTime) && '(future)' }
+                { (event.startTime <= gameData.currentTime) && (event.startTime - gameData.currentTime + event.duration > 0) && `(${getHourAndMinutes(event.startTime - gameData.currentTime + event.duration)} left)` }
+                { (event.startTime <= gameData.currentTime) && (event.startTime - gameData.currentTime + event.duration <= 0) && '(expired)' }
               </div>
             </div>
           ))}

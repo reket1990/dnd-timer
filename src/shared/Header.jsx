@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { getDate, getHourAndMinutes } from './utils';
+import { getDateFromUnix, getHourAndMinutesFromUnix } from './utils';
 
 function Header({ currentTime, gameCode, title }) {
   const styles = {
@@ -27,12 +27,12 @@ function Header({ currentTime, gameCode, title }) {
 
       <div style={styles.day}>
         Current Date: &nbsp;
-        { getDate(currentTime) }
+        { getDateFromUnix(currentTime) }
       </div>
 
       <div style={styles.time}>
         Current Time: &nbsp;
-        { getHourAndMinutes(currentTime) }
+        { getHourAndMinutesFromUnix(currentTime) }
       </div>
     </>
   );

@@ -105,7 +105,7 @@ function Travel({
 
   const onSubmitClick = () => {
     const formDescription = `${selectedTravel.name} (${selectedTravel.speed}mph) - ${Number(formDistance).toFixed(1)} miles`;
-    addEvent(formDescription, Math.floor(Number(formStartTime)), Math.floor(Number(formDuration)));
+    addEvent(formDescription, Math.floor(Number(formStartTime)), Math.floor(Number(formDuration)) * 60); // multiply by 60 to convert to seconds
     setFormStartTime(gameData.currentTime);
     setFormDuration(0);
     setFormDistance(0);
