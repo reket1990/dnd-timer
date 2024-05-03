@@ -29,7 +29,6 @@ function App() {
   const [gameData, setGameData] = useState({ currentTime: 0, events: [] });
   const [pageType, setPageType] = useState('Today');
   const code = queryParameters.get('code');
-  const day = Number(queryParameters.get('day'));
 
   // Function that saves the game data
   const saveGameData = React.useCallback((newGameData) => {
@@ -42,6 +41,22 @@ function App() {
     newGameData.time = newTime;
     saveGameData(newGameData);
   }, [gameData, saveGameData]);
+
+  const addEvent = (type, name, startTime, duration, callback = () => {}) => {
+    const newGameData = gameData;
+    newGameData.events.push({
+      type: 'event', name, startTime, duration,
+    });
+
+    // Check if we should change current time
+    if (startTime + duration >= gameData.currentTime) {
+      newGameData.currentTime = startTime + duration;
+    }
+
+    saveGameData(newGameData).then(() => {
+      callback();
+    });
+  };
 
   // Load the game data from the db
   useEffect(() => {
@@ -58,7 +73,7 @@ function App() {
         }
       });
     }
-  }, [code, day, setGameData, saveGameData]);
+  }, [code, setGameData, saveGameData]);
 
   let contents;
   let title;
@@ -75,8 +90,7 @@ function App() {
     title = 'Today';
     contents = (
       <Today
-        gameCode={code}
-        day={day}
+        addEvent={addEvent}
         gameData={gameData}
         setPageType={setPageType}
         saveGameData={saveGameData}
@@ -86,7 +100,6 @@ function App() {
     title = 'Calendar';
     contents = (
       <Calendar
-        gameCode={code}
         gameData={gameData}
         setPageType={setPageType}
         setCurrentTime={setCurrentTime}
@@ -96,7 +109,6 @@ function App() {
     title = 'Encounter';
     contents = (
       <Encounter
-        gameCode={code}
         gameData={gameData}
         setPageType={setPageType}
         saveGameData={saveGameData}
@@ -106,10 +118,9 @@ function App() {
     title = 'Travel';
     contents = (
       <Travel
-        gameCode={code}
+        addEvent={addEvent}
         gameData={gameData}
         setPageType={setPageType}
-        saveGameData={saveGameData}
       />
     );
   }

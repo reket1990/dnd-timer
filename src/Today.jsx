@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { getHourAndMinutes, getHourAndMinutesFromUnix } from './shared/utils';
 
 function Today({
-  gameData, setPageType, saveGameData,
+  addEvent, gameData, setPageType, saveGameData, // eslint-disable-line no-unused-vars
 }) {
   const [tab, setTab] = useState('Summary');
   const [formDuration, setFormDuration] = useState(0);
@@ -84,14 +84,6 @@ function Today({
     },
   };
 
-  const addEvent = (type, name, currentTime, duration) => {
-    const newGameData = gameData;
-    newGameData.timers.push({
-      type, name, duration, startTime: currentTime,
-    });
-    saveGameData(newGameData);
-  };
-
   const onFormDurationChange = (event) => {
     setFormDuration(event.target.value);
   };
@@ -102,9 +94,9 @@ function Today({
 
   const onSubmitClick = () => {
     if (tab === 'Summary') {
-      addEvent('event', formDescription, Number(formDuration), gameData.currentTime); // TODO: field for current time
+      addEvent('event', formDescription, gameData.currentTime, Number(formDuration) * 60); //  multiply by 60 to convert to seconds
     } else {
-      addEvent('timer', formDescription, Number(formDuration), gameData.currentTime); // TODO: field for current time
+      addEvent('timer', formDescription, gameData.currentTime, Number(formDuration) * 60); //  multiply by 60 to convert to seconds
     }
     setFormDuration(0);
     setFormDescription('');
@@ -203,7 +195,7 @@ function Today({
               ...styles.restButton,
               backgroundColor: '#92D7DC',
             }}
-            onClick={() => addEvent('Short Rest', 60)}
+            onClick={() => addEvent('event', 'Short Rest', gameData.currentTime, 60 * 60)} // 1 hour
           >
             Short Rest
           </button>
@@ -213,7 +205,7 @@ function Today({
               ...styles.restButton,
               backgroundColor: '#6AA3A5',
             }}
-            onClick={() => addEvent('Long Rest', 480)}
+            onClick={() => addEvent('event', 'Long Rest', gameData.currentTime, 8 * 60 * 60)} // 8 hours
           >
             Long Rest
           </button>
@@ -257,6 +249,7 @@ function Today({
 }
 
 Today.propTypes = {
+  addEvent: PropTypes.func.isRequired,
   gameData: PropTypes.shape({
     currentTime: PropTypes.number.isRequired,
     events: PropTypes.arrayOf(PropTypes.shape({

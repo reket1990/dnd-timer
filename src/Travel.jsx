@@ -15,7 +15,7 @@ const travelData = [
 ];
 
 function Travel({
-  gameData, setPageType, saveGameData,
+  addEvent, gameData, setPageType,
 }) {
   const [formStartTime, setFormStartTime] = useState(gameData.currentTime);
   const [formDuration, setFormDuration] = useState(0);
@@ -74,14 +74,6 @@ function Travel({
     },
   };
 
-  const addEvent = (name, startTime, duration) => {
-    const newGameData = gameData;
-    newGameData.events.push({
-      type: 'event', name, startTime, duration,
-    });
-    saveGameData(newGameData);
-  };
-
   const handleRadioChange = (event) => {
     const selectedTravelIndex = travelData.findIndex(
       (travel) => travel.name === event.target.value,
@@ -105,7 +97,7 @@ function Travel({
 
   const onSubmitClick = () => {
     const formDescription = `${selectedTravel.name} (${selectedTravel.speed}mph) - ${Number(formDistance).toFixed(1)} miles`;
-    addEvent(formDescription, Math.floor(Number(formStartTime)), Math.floor(Number(formDuration)) * 60); // multiply by 60 to convert to seconds
+    addEvent('event', formDescription, Math.floor(Number(formStartTime)), Math.floor(Number(formDuration)) * 60, () => setPageType('Today')); // multiply by 60 to convert to seconds
     setFormStartTime(gameData.currentTime);
     setFormDuration(0);
     setFormDistance(0);
@@ -196,6 +188,7 @@ function Travel({
 }
 
 Travel.propTypes = {
+  addEvent: PropTypes.func.isRequired,
   gameData: PropTypes.shape({
     currentTime: PropTypes.number.isRequired,
     events: PropTypes.arrayOf(PropTypes.shape({
@@ -206,7 +199,6 @@ Travel.propTypes = {
     })).isRequired,
   }).isRequired,
   setPageType: PropTypes.func.isRequired,
-  saveGameData: PropTypes.func.isRequired,
 };
 
 export default Travel;
