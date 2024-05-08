@@ -27,14 +27,6 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 function App() {
-  const styles = {
-    video: {
-      width: '100%',
-      height: '100%',
-      objectFit: 'cover',
-    },
-  };
-
   const [queryParameters] = useSearchParams();
   const [gameData, setGameData] = useState({ currentTime: 0, events: [] });
   const [pageType, setPageType] = useState('Today');
@@ -91,7 +83,7 @@ function App() {
     // Load Get Code form if no code
     return (
       <div className="App">
-        <video src={fog} style={styles.video} autoPlay loop muted />
+        <video src={fog} autoPlay loop muted />
         <GetCode />
       </div>
     );
