@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/media-has-caption */
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { initializeApp } from 'firebase/app';
@@ -5,6 +6,7 @@ import {
   getFirestore, doc, setDoc, onSnapshot,
 } from 'firebase/firestore';
 import './App.css';
+import fog from './assets/fog.mp4';
 import Header from './shared/Header';
 import GetCode from './GetCode';
 import Today from './Today';
@@ -25,6 +27,14 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 function App() {
+  const styles = {
+    video: {
+      width: '100%',
+      height: '100%',
+      objectFit: 'cover',
+    },
+  };
+
   const [queryParameters] = useSearchParams();
   const [gameData, setGameData] = useState({ currentTime: 0, events: [] });
   const [pageType, setPageType] = useState('Today');
@@ -81,6 +91,7 @@ function App() {
     // Load Get Code form if no code
     return (
       <div className="App">
+        <video src={fog} style={styles.video} autoPlay loop muted />
         <GetCode />
       </div>
     );

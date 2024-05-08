@@ -4,6 +4,15 @@ function GetCode() {
   const [code, setCode] = useState('');
 
   const styles = {
+    container: {
+      position: 'absolute',
+      width: '100%',
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
     title: {
       fontSize: '36px',
       marginBottom: '20px',
@@ -32,7 +41,7 @@ function GetCode() {
   };
 
   return (
-    <>
+    <div style={styles.container}>
       <div style={styles.title}>
         Enter Game Code:
       </div>
@@ -50,7 +59,7 @@ function GetCode() {
       >
         Submit
       </button>
-    </>
+    </div>
   );
 }
 
