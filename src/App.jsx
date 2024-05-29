@@ -112,6 +112,7 @@ function App() {
     title = 'Encounter';
     contents = (
       <Encounter
+        addEvent={addEvent}
         gameData={gameData}
         setPageType={setPageType}
         saveGameData={saveGameData}

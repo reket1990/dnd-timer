@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 function Encounter({
-  gameData, setPageType, saveGameData, // eslint-disable-line no-unused-vars
+  addEvent, gameData, setPageType, saveGameData, // eslint-disable-line no-unused-vars
 }) {
   const styles = {
     contentContainer: {
@@ -32,6 +32,19 @@ function Encounter({
     <>
       <div style={styles.contentContainer} />
 
+      <div style={styles.restContainer}>
+        <button
+          type="button"
+          style={{
+            ...styles.restButton,
+            backgroundColor: '#92D7DC',
+          }}
+          onClick={() => addEvent('event', 'Round', gameData.currentTime, 6)} // 6 seconds
+        >
+          Next Round
+        </button>
+      </div>
+
       <div style={styles.footer}>
         <button
           type="button"
@@ -49,6 +62,7 @@ function Encounter({
 }
 
 Encounter.propTypes = {
+  addEvent: PropTypes.func.isRequired,
   gameData: PropTypes.shape({
     currentTime: PropTypes.number.isRequired,
     events: PropTypes.arrayOf(PropTypes.shape({
