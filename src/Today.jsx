@@ -106,7 +106,9 @@ function Today({
     <>
       <div style={tab === 'Summary' ? styles.shortContentContainer : styles.contentContainer}>
         <div style={styles.subtitle} onClick={() => setTab(tab === 'Summary' ? 'Timers' : 'Summary')}>
-          Summary &nbsp; ▼
+          Summary &nbsp;
+          {' '}
+          { tab === 'Summary' ? '▼' : '▲' }
         </div>
 
         { tab === 'Summary' && gameData.events.length === 0 && (
@@ -135,7 +137,7 @@ function Today({
         <div style={styles.subtitle} onClick={() => setTab(tab === 'Summary' ? 'Timers' : 'Summary')}>
           Timers &nbsp;
           {' '}
-          { tab === 'Summary' ? '▼' : '▲' }
+          { tab === 'Timers' ? '▼' : '▲' }
         </div>
 
         { tab === 'Timers' && gameData.events.length === 0 && (

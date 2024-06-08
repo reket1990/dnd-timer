@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
 function Encounter({
   addEvent, gameData, setPageType, saveGameData, // eslint-disable-line no-unused-vars
 }) {
+  const [round, setRound] = useState(1);
+
   const styles = {
     contentContainer: {
       height: '500px',
@@ -32,6 +34,8 @@ function Encounter({
     <>
       <div style={styles.contentContainer} />
 
+      {round}
+
       <div style={styles.restContainer}>
         <button
           type="button"
@@ -39,9 +43,22 @@ function Encounter({
             ...styles.restButton,
             backgroundColor: '#92D7DC',
           }}
-          onClick={() => addEvent('event', 'Round', gameData.currentTime, 6)} // 6 seconds
+          onClick={() => setRound(round + 1)}
         >
           Next Round
+        </button>
+      </div>
+
+      <div style={styles.restContainer}>
+        <button
+          type="button"
+          style={{
+            ...styles.restButton,
+            backgroundColor: '#92D7DC',
+          }}
+          onClick={() => addEvent('event', 'Encounter', gameData.currentTime, Math.ceil((round * 6) / 60) * 60)} // add to Today's events
+        >
+          Add Event
         </button>
       </div>
 
